@@ -18,10 +18,10 @@ import javafx.collections.ObservableList;
  * @author Jamie
  */
 public class SalesDataParser {
-    public ObservableList<SalesData> parseJSONData(String json) {
-        Type listType = new TypeToken<ArrayList<SalesData>>() {}.getType();
-        List<SalesData> dataList = new Gson().fromJson(json, listType);
-
+    public ObservableList<Sales> parseJSONData(String json) {
+        Type listType = new TypeToken<ArrayList<Sales>>() {}.getType();
+        List<Sales> dataList = new Gson().fromJson(json, listType);
+       
         return FXCollections.observableArrayList(dataList);
     }
 }

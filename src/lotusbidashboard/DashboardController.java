@@ -69,7 +69,7 @@ public class DashboardController implements Initializable {
     private VBox chartFilters;
 
     private final SalesService salesService = new SalesService();
-    private ObservableList<SalesData> data = FXCollections.observableArrayList();
+    private ObservableList<Sales> data = FXCollections.observableArrayList();
     private List<Integer> years;
     private List<String> vehicles;
     private List<String> regions;
@@ -112,7 +112,7 @@ public class DashboardController implements Initializable {
             data.setAll(salesService.getValue());
         });
         
-        data.addListener((ListChangeListener.Change<? extends SalesData> c) -> {
+        data.addListener((ListChangeListener.Change<? extends Sales> c) -> {
                 setFilters();
                 createFilterCheckboxes();
                 addFiltersToUI();
@@ -234,21 +234,21 @@ public class DashboardController implements Initializable {
     }
 
     private void buildTable() {
-        TableColumn<SalesData,Integer> yearCol = new TableColumn<>();
+        TableColumn yearCol = new TableColumn();
         yearCol.setText("Year");
-        yearCol.setCellValueFactory(new PropertyValueFactory<SalesData, Integer>("Year"));
-        TableColumn<SalesData,Integer> qtrCol = new TableColumn<>();
+        yearCol.setCellValueFactory(new PropertyValueFactory("Year"));
+        TableColumn qtrCol = new TableColumn();
         qtrCol.setText("Quarter");
-        qtrCol.setCellValueFactory(new PropertyValueFactory<SalesData, Integer>("QTR"));
+        qtrCol.setCellValueFactory(new PropertyValueFactory<>("QTR"));
         TableColumn modelCol = new TableColumn();
         modelCol.setText("Model");
         modelCol.setCellValueFactory(new PropertyValueFactory("Vehicle"));
         TableColumn regionCol = new TableColumn();
         regionCol.setText("Region");
         regionCol.setCellValueFactory(new PropertyValueFactory("Region"));
-        TableColumn<SalesData,Integer> salesCol = new TableColumn<>();
+        TableColumn salesCol = new TableColumn();
         salesCol.setText("Sales");
-        salesCol.setCellValueFactory(new PropertyValueFactory<SalesData, Integer>("Quantity"));
+        salesCol.setCellValueFactory(new PropertyValueFactory("Quantity"));
         
         dataTable.getColumns().addAll(yearCol,qtrCol,modelCol,regionCol,salesCol);
         //dataTable.itemsProperty().bind(salesService.valueProperty());

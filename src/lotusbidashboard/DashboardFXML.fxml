@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.chart.BarChart?>
 <?import javafx.scene.chart.CategoryAxis?>
@@ -21,7 +26,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lotusbidashboard.DashboardController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lotusbidashboard.DashboardController">
    <left>
       <Accordion prefHeight="370.0" prefWidth="250.0" BorderPane.alignment="CENTER">
         <panes>
@@ -33,12 +38,12 @@
                      </children></AnchorPane>
             </content>
           </TitledPane>
-          <TitledPane animated="false" text="Styling">
+          <TitledPane animated="false" expanded="false" text="Styling">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
             </content>
           </TitledPane>
-          <TitledPane animated="false" prefHeight="320.0" prefWidth="80.0" text="Other">
+          <TitledPane animated="false" expanded="false" prefHeight="320.0" prefWidth="80.0" text="Other">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
             </content>
@@ -67,21 +72,6 @@
                <items>
                   <TabPane tabClosingPolicy="UNAVAILABLE">
                     <tabs>
-                      <Tab text="Line Chart">
-                        <content>
-                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                                 <children>
-                                    <LineChart fx:id="lineChart" visible="false">
-                                      <xAxis>
-                                        <CategoryAxis side="BOTTOM" />
-                                      </xAxis>
-                                      <yAxis>
-                                        <NumberAxis side="LEFT" />
-                                      </yAxis>
-                                    </LineChart>
-                                 </children></AnchorPane>
-                        </content>
-                      </Tab>
                       <Tab text="Bar Chart">
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
@@ -94,6 +84,21 @@
                                         <NumberAxis side="LEFT" />
                                       </yAxis>
                                     </BarChart>
+                                 </children></AnchorPane>
+                        </content>
+                      </Tab>
+                      <Tab text="Line Chart">
+                        <content>
+                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <LineChart fx:id="lineChart" visible="false">
+                                      <xAxis>
+                                        <CategoryAxis side="BOTTOM" />
+                                      </xAxis>
+                                      <yAxis>
+                                        <NumberAxis side="LEFT" />
+                                      </yAxis>
+                                    </LineChart>
                                  </children></AnchorPane>
                         </content>
                       </Tab>

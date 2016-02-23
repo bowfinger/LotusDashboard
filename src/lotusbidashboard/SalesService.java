@@ -14,7 +14,7 @@ import javafx.util.Duration;
  *
  * @author Jamie
  */
-public class SalesService extends ScheduledService<ObservableList<SalesData>> {
+public class SalesService extends ScheduledService<ObservableList<Sales>> {
 
     private static final Duration DELAY = new Duration(30000);
 
@@ -25,7 +25,7 @@ public class SalesService extends ScheduledService<ObservableList<SalesData>> {
 
 
     @Override
-    protected Task<ObservableList<SalesData>> createTask() {
+    protected Task<ObservableList<Sales>> createTask() {
         return new SalesTask();
     }
 }
