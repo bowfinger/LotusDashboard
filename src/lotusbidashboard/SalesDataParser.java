@@ -22,6 +22,8 @@ public class SalesDataParser {
         Type listType = new TypeToken<ArrayList<Sales>>() {}.getType();
         List<Sales> dataList = new Gson().fromJson(json, listType);
        
+        //test
+        System.out.println(dataList.size());
         return FXCollections.observableArrayList(dataList);
     }
 }

@@ -83,7 +83,10 @@ class SalesTask extends Task<ObservableList<Sales>> {
     @Override
     protected ObservableList<Sales> call() throws Exception {
         String data = getData();
+        
+        //only for testing purposes
         System.out.println(data);
+        
         return dataParser.parseJSONData(data);
     }
 }

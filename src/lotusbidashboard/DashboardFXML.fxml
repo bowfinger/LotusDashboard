@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.chart.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.chart.BarChart?>
 <?import javafx.scene.chart.CategoryAxis?>
@@ -26,11 +21,11 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lotusbidashboard.DashboardController">
+<BorderPane xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lotusbidashboard.DashboardController">
    <left>
-      <Accordion prefHeight="370.0" prefWidth="250.0" BorderPane.alignment="CENTER">
+      <Accordion fx:id="accordion" prefHeight="370.0" prefWidth="250.0" BorderPane.alignment="CENTER">
         <panes>
-          <TitledPane animated="false" text="Charts">
+          <TitledPane fx:id="chartsPane" expanded="true" text="Charts">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
@@ -38,12 +33,12 @@
                      </children></AnchorPane>
             </content>
           </TitledPane>
-          <TitledPane animated="false" expanded="false" text="Styling">
+          <TitledPane expanded="false" text="Styling">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
             </content>
           </TitledPane>
-          <TitledPane animated="false" expanded="false" prefHeight="320.0" prefWidth="80.0" text="Other">
+          <TitledPane expanded="false" prefHeight="320.0" prefWidth="80.0" text="Other">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
             </content>

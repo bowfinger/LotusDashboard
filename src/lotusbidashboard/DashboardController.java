@@ -28,11 +28,13 @@ import javafx.geometry.Insets;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Accordion;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TitledPane;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
@@ -67,9 +69,16 @@ public class DashboardController implements Initializable {
     
     @FXML
     private VBox chartFilters;
+    
+    @FXML
+    private Accordion accordion;
+    
+    @FXML
+    private TitledPane chartsPane;
 
     private final SalesService salesService = new SalesService();
     private ObservableList<Sales> data = FXCollections.observableArrayList();
+    private List<Sales> filteredData;
     private List<Integer> years;
     private List<String> vehicles;
     private List<String> regions;
@@ -82,6 +91,9 @@ public class DashboardController implements Initializable {
         
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        
+        //set expanded accordion
+        accordion.setExpandedPane(chartsPane);
         
         //set service change listener
         salesService.stateProperty().addListener((ObservableValue<? extends Worker.State> observableValue, Worker.State oldState, Worker.State newState) -> {
@@ -113,11 +125,15 @@ public class DashboardController implements Initializable {
         });
         
         data.addListener((ListChangeListener.Change<? extends Sales> c) -> {
-                setFilters();
-                createFilterCheckboxes();
-                addFiltersToUI();
-                bindTable();
-                buildBarChart();
+            
+            //checkbox filter setup
+            setFilters();
+            createFilterCheckboxes();
+            addFiltersToUI();
+                
+            filterData();
+            bindTable();
+            buildBarChart();
         });
         
         buildTable();
@@ -134,15 +150,14 @@ public class DashboardController implements Initializable {
         //clear charts
         barChart.getData().clear();
 
-        for(CheckBox year : yearCheckboxes){
-            if(year.isSelected()){
-                XYChart.Series series = new XYChart.Series();
-                series.setName(year.getText());
-                data.stream().filter(o -> Integer.toString(o.getYear()).equals(year.getText())).forEach(o -> series.getData().add(new XYChart.Data<>(o.getVehicle(), o.getQuantity())));
-            
-                barChart.getData().add(series);
-            }
-        }
+        yearCheckboxes.stream().filter((year) -> (year.isSelected())).map((year) -> {
+            XYChart.Series series = new XYChart.Series();
+            series.setName(year.getText());
+            data.stream().filter(o -> Integer.toString(o.getYear()).equals(year.getText())).forEach(o -> series.getData().add(new XYChart.Data<>(o.getVehicle(), o.getQuantity())));
+            return series;
+        }).forEach((series) -> {
+            barChart.getData().add(series);
+        });
     }
 
 
@@ -167,12 +182,16 @@ public class DashboardController implements Initializable {
     }
 
     private void setFilters() {
-        years = data.stream().map(o -> o.getYear()).distinct().collect(Collectors.toList());
-        vehicles = data.stream().map(o -> o.getVehicle()).distinct().collect(Collectors.toList());
-        regions = data.stream().map(o -> o.getRegion()).distinct().collect(Collectors.toList());
+        years = data.stream().map(o -> o.getYear()).distinct().sorted().collect(Collectors.toList());
+        vehicles = data.stream().map(o -> o.getVehicle()).distinct().sorted().collect(Collectors.toList());
+        regions = data.stream().map(o -> o.getRegion()).distinct().sorted().collect(Collectors.toList());
     }
 
     private void createFilterCheckboxes() {
+        /*  
+            used to compare previous to new as checkboxes 
+            rebuilt on receiving new data.
+        */
         List<CheckBox> temp;
         temp = yearCheckboxes;        
         yearCheckboxes = buildCheckboxes(temp, years);
@@ -215,11 +234,15 @@ public class DashboardController implements Initializable {
             CheckBox cb = new CheckBox(list.get(index).toString());
             cb.setSelected(true);
             cb.setOnAction(e ->{
+                
+                filterData();
+                //add more here
                 buildBarChart();
             });
             checkBoxes.add(cb);
         }
         
+        //sets selected state after comparing to original state in list
         if(cbList.size() > 0){
             for(CheckBox origCb : cbList){
             for(CheckBox newCb : checkBoxes){
@@ -252,6 +275,19 @@ public class DashboardController implements Initializable {
         
         dataTable.getColumns().addAll(yearCol,qtrCol,modelCol,regionCol,salesCol);
         //dataTable.itemsProperty().bind(salesService.valueProperty());
+    }
+
+    private void filterData() {
+        
+        List<Sales> list = new ArrayList<Sales>();
+        
+        for(CheckBox year : yearCheckboxes){
+            if(year.isSelected()){
+                list = data.stream().filter(o -> Integer.toString(o.getYear()).equals(year.getText())).collect(Collectors.toList());
+            }
+        }
+        System.out.println("filtered data size " + list.size());
+        
     }
     
     
