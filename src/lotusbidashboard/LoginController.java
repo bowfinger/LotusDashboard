@@ -14,6 +14,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -21,6 +22,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 /**
@@ -110,6 +112,16 @@ public class LoginController implements Initializable {
         Parent root = FXMLLoader.load(getClass().getResource("DashboardFXML.fxml"));
         Scene scene = new Scene(root);
         stage.setScene(scene);
+        
+        //get reference to current display device
+        Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
+
+        //set Stage boundaries to visible bounds of the main screen
+        stage.setX(primaryScreenBounds.getMinX());
+        stage.setY(primaryScreenBounds.getMinY());
+        stage.setWidth(primaryScreenBounds.getWidth());
+        stage.setHeight(primaryScreenBounds.getHeight());
+        
         stage.show();
     }
     

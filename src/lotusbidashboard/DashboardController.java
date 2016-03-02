@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -23,16 +21,17 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.chart.XYChart.Data;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableColumn;
@@ -78,22 +77,55 @@ public class DashboardController implements Initializable {
     
     @FXML
     private TitledPane chartsPane;
+    
+    @FXML
+    private ComboBox seriesComboBox;
+    
+    @FXML
+    private ComboBox xAxisComboBox;
 
     private final SalesService salesService = new SalesService();
     private ObservableList<Sales> data = FXCollections.observableArrayList();
-    private List<Sales> filteredData;
+    //private List<Sales> filteredData;
     private List<Integer> years;
     private List<String> vehicles;
     private List<String> regions;
     private final List<String> quarters = Arrays.asList("Q1","Q2","Q3","Q4");
+    private final List<String> chartSeriesAxis = Arrays.asList("Years", "Quarters", "Vehicles", "Regions");
     
-    private List<CheckBox> yearCheckboxes = new ArrayList<CheckBox>();
-    private List<CheckBox> vehicleCheckboxes = new ArrayList<CheckBox>();
-    private List<CheckBox> regionCheckboxes = new ArrayList<CheckBox>();
-    private List<CheckBox> quarterCheckboxes = new ArrayList<CheckBox>();
+    private List<CheckBox> yearCheckboxes = new ArrayList<>();
+    private List<CheckBox> vehicleCheckboxes = new ArrayList<>();
+    private List<CheckBox> regionCheckboxes = new ArrayList<>();
+    private List<CheckBox> quarterCheckboxes = new ArrayList<>();
         
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        
+        //bind combo boxes and set change listeners
+        //these combo boxes control the x-axis and series of
+        //relevant chart types
+        
+        seriesComboBox.getItems().setAll(chartSeriesAxis);
+        seriesComboBox.valueProperty().addListener(new ChangeListener<String>() {
+        @Override public void changed(ObservableValue observable, String oldValue, String newValue) {
+            xAxisComboBox.getItems().setAll(chartSeriesAxis.stream()
+                    .filter(o -> !o.equals(newValue))
+                    .collect(Collectors.toCollection(()->FXCollections.observableArrayList())));
+            xAxisComboBox.getSelectionModel().selectFirst();
+            
+            //fire event here?
+            System.out.println("seriesChangedFired");
+        }    
+        });
+        seriesComboBox.getSelectionModel().selectFirst();
+        xAxisComboBox.valueProperty().addListener(new ChangeListener<String>(){
+            @Override
+            public void changed(ObservableValue observable, String oldValue, String newValue) {
+                //fire event
+                System.out.println("xAxisChangedFired");
+            }
+            
+        });
         
         //set expanded accordion
         accordion.setExpandedPane(chartsPane);
@@ -159,11 +191,36 @@ public class DashboardController implements Initializable {
                          .collect(Collectors.groupingBy(Sales::getVehicle, Collectors.reducing(0, Sales::getQuantity, Integer::sum))); 
               
              for (Map.Entry<String, Integer> entry : totalSalesByYear.entrySet()) { 
-                 series.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue())); 
+                 XYChart.Data chartData = new XYChart.Data<>(entry.getKey(), entry.getValue());
+                 chartData.setNode(new HoveredThresholdNode(entry.getValue()));
+                 series.getData().add(chartData);
              } 
              return series; 
          }).forEach((series) -> { 
              barChart.getData().add(series); 
+         });
+    }
+    
+    private void buildLineChart(ObservableList<Sales> filteredData){
+        
+        lineChart.getData().clear();
+        lineChart.getXAxis().setLabel("Vehicle");
+         
+         years.stream().map((year) -> { 
+             XYChart.Series series = new XYChart.Series(); 
+             series.setName(Integer.toString(year));           
+             Map<String, Integer> totalSalesByYear = filteredData.stream() 
+                     .filter(o -> o.getYear() == year) 
+                         .collect(Collectors.groupingBy(Sales::getVehicle, Collectors.reducing(0, Sales::getQuantity, Integer::sum))); 
+              
+             for (Map.Entry<String, Integer> entry : totalSalesByYear.entrySet()) { 
+                 XYChart.Data chartData = new XYChart.Data<>(entry.getKey(), entry.getValue());
+                 chartData.setNode(new HoveredThresholdNode(entry.getValue()));
+                 series.getData().add(chartData); 
+             } 
+             return series; 
+         }).forEach((series) -> { 
+             lineChart.getData().add(series); 
          });
     }
 
@@ -344,13 +401,14 @@ public class DashboardController implements Initializable {
                      } 
                  } 
              } 
-             System.out.println(s + " = " + foundYear +" : "+foundVehicle +" : "+ foundRegion  +" : "+ foundQuarter); 
+             //System.out.println(s + " = " + foundYear +" : "+foundVehicle +" : "+ foundRegion  +" : "+ foundQuarter); 
              if (foundYear && foundVehicle && foundRegion && foundQuarter) { 
                  filteredData.add(s); 
              }          
          }); 
          //updateStats(filteredData); 
-         buildBarChart(filteredData); 
+         buildBarChart(filteredData);
+         buildLineChart(filteredData);
          bindTable(filteredData);
      }
     

@@ -7,6 +7,7 @@
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.SplitPane?>
@@ -40,7 +41,17 @@
           </TitledPane>
           <TitledPane expanded="false" prefHeight="320.0" prefWidth="80.0" text="Other">
             <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <children>
+                              <Label text="Series" />
+                              <ComboBox fx:id="seriesComboBox" maxWidth="1.7976931348623157E308" />
+                              <Label text="X-Axis" />
+                              <ComboBox maxWidth="1.7976931348623157E308" fx:id="xAxisComboBox" />
+                           </children>
+                        </VBox>
+                     </children></AnchorPane>
             </content>
           </TitledPane>
         </panes>
@@ -86,7 +97,7 @@
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
-                                    <LineChart fx:id="lineChart" visible="false">
+                                    <LineChart fx:id="lineChart" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                       <xAxis>
                                         <CategoryAxis side="BOTTOM" />
                                       </xAxis>
