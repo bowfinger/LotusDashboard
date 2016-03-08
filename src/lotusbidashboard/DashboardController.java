@@ -190,11 +190,13 @@ public class DashboardController implements Initializable {
                      .filter(o -> o.getYear() == year) 
                          .collect(Collectors.groupingBy(Sales::getVehicle, Collectors.reducing(0, Sales::getQuantity, Integer::sum))); 
               
-             for (Map.Entry<String, Integer> entry : totalSalesByYear.entrySet()) { 
+             totalSalesByYear.entrySet().stream().map((entry) -> { 
                  XYChart.Data chartData = new XYChart.Data<>(entry.getKey(), entry.getValue());
                  chartData.setNode(new HoveredThresholdNode(entry.getValue()));
+                 return chartData;
+             }).forEach((chartData) -> {
                  series.getData().add(chartData);
-             } 
+             }); 
              return series; 
          }).forEach((series) -> { 
              barChart.getData().add(series); 
@@ -213,11 +215,13 @@ public class DashboardController implements Initializable {
                      .filter(o -> o.getYear() == year) 
                          .collect(Collectors.groupingBy(Sales::getVehicle, Collectors.reducing(0, Sales::getQuantity, Integer::sum))); 
               
-             for (Map.Entry<String, Integer> entry : totalSalesByYear.entrySet()) { 
+             totalSalesByYear.entrySet().stream().map((entry) -> { 
                  XYChart.Data chartData = new XYChart.Data<>(entry.getKey(), entry.getValue());
                  chartData.setNode(new HoveredThresholdNode(entry.getValue()));
-                 series.getData().add(chartData); 
-             } 
+                return chartData;
+            }).forEach((chartData) -> { 
+                series.getData().add(chartData);
+            });
              return series; 
          }).forEach((series) -> { 
              lineChart.getData().add(series); 
