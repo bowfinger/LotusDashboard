@@ -1,19 +1,19 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package lotusbidashboard;
 
 import java.net.URL;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -21,6 +21,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -41,6 +42,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
 /**
  *
@@ -73,16 +75,10 @@ public class DashboardController implements Initializable {
     private VBox chartFilters;
     
     @FXML
-    private Accordion accordion;
+    private Label sysTimeLabel;
     
-    @FXML
-    private TitledPane chartsPane;
-    
-    @FXML
-    private ComboBox seriesComboBox;
-    
-    @FXML
-    private ComboBox xAxisComboBox;
+    private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+    private final SimpleDateFormat fullDateFormat = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
 
     private final SalesService salesService = new SalesService();
     private ObservableList<Sales> data = FXCollections.observableArrayList();
@@ -101,34 +97,19 @@ public class DashboardController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         
-        //bind combo boxes and set change listeners
-        //these combo boxes control the x-axis and series of
-        //relevant chart types
-        
-        seriesComboBox.getItems().setAll(chartSeriesAxis);
-        seriesComboBox.valueProperty().addListener(new ChangeListener<String>() {
-        @Override public void changed(ObservableValue observable, String oldValue, String newValue) {
-            xAxisComboBox.getItems().setAll(chartSeriesAxis.stream()
-                    .filter(o -> !o.equals(newValue))
-                    .collect(Collectors.toCollection(()->FXCollections.observableArrayList())));
-            xAxisComboBox.getSelectionModel().selectFirst();
-            
-            //fire event here?
-            System.out.println("seriesChangedFired");
-        }    
-        });
-        seriesComboBox.getSelectionModel().selectFirst();
-        xAxisComboBox.valueProperty().addListener(new ChangeListener<String>(){
+        final Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), new EventHandler<ActionEvent>(){
+
             @Override
-            public void changed(ObservableValue observable, String oldValue, String newValue) {
-                //fire event
-                System.out.println("xAxisChangedFired");
+            public void handle(ActionEvent event) {
+                final Calendar cal = Calendar.getInstance();
+                sysTimeLabel.setText(timeFormat.format(cal.getTime()));
             }
-            
-        });
+        }));
         
-        //set expanded accordion
-        accordion.setExpandedPane(chartsPane);
+        timeline.setCycleCount(Animation.INDEFINITE);
+        timeline.play();
+        
+        
         
         //set service change listener
         salesService.stateProperty().addListener((ObservableValue<? extends Worker.State> observableValue, Worker.State oldState, Worker.State newState) -> {
@@ -173,10 +154,7 @@ public class DashboardController implements Initializable {
     
         myProgressIndicator.progressProperty().bind(salesService.progressProperty());
 
-        if(!salesService.isRunning()){
-            salesService.reset();
-            salesService.start();
-        }
+        salesService.start();
     }    
     
     private void buildBarChart(ObservableList<Sales> filteredData) {
@@ -235,7 +213,7 @@ public class DashboardController implements Initializable {
     }
 
     private void setLastUpdated() {
-        lastUpdatedLabel.setText(String.format("Last Updated: %s", new SimpleDateFormat("dd/MM/yyyy - hh:mm:ss").format(new Date())));
+        lastUpdatedLabel.setText(String.format("Last Updated: %s", fullDateFormat.format(new Date())));
     }
 
     public void onAutoUpdateCheckChanged(ActionEvent actionEvent) {

@@ -28,49 +28,20 @@
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lotusbidashboard.DashboardController">
-   <left>
-      <Accordion fx:id="accordion" prefHeight="370.0" prefWidth="250.0" BorderPane.alignment="CENTER">
-        <panes>
-          <TitledPane fx:id="chartsPane" expanded="true" text="Charts">
-            <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                     <children>
-                        <VBox fx:id="chartFilters" />
-                     </children></AnchorPane>
-            </content>
-          </TitledPane>
-          <TitledPane expanded="false" text="Styling">
-            <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-            </content>
-          </TitledPane>
-          <TitledPane expanded="false" prefHeight="320.0" prefWidth="80.0" text="Other">
-            <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                     <children>
-                        <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                           <children>
-                              <Label text="Series" />
-                              <ComboBox fx:id="seriesComboBox" maxWidth="1.7976931348623157E308" />
-                              <Label text="X-Axis" />
-                              <ComboBox maxWidth="1.7976931348623157E308" fx:id="xAxisComboBox" />
-                           </children>
-                        </VBox>
-                     </children></AnchorPane>
-            </content>
-          </TitledPane>
-        </panes>
-      </Accordion>
-   </left>
    <bottom>
       <HBox prefHeight="11.0" prefWidth="600.0" BorderPane.alignment="CENTER">
          <children>
-            <CheckBox fx:id="autoUpdateCheck" mnemonicParsing="false" onAction="#onAutoUpdateCheckChanged" prefHeight="17.0" prefWidth="90.0" selected="true" text="Auto update" />
-            <Label fx:id="lastUpdatedLabel" alignment="CENTER_RIGHT">
-               <padding>
-                  <Insets left="10.0" />
-               </padding>
-            </Label>
+            <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+               <children>
+                  <CheckBox fx:id="autoUpdateCheck" mnemonicParsing="false" onAction="#onAutoUpdateCheckChanged" prefHeight="17.0" prefWidth="90.0" selected="true" text="Auto update" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                  <Label fx:id="lastUpdatedLabel" alignment="CENTER_RIGHT" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="290.0" AnchorPane.topAnchor="0.0">
+                     <padding>
+                        <Insets left="10.0" />
+                     </padding>
+                  </Label>
+                  <Label fx:id="sysTimeLabel" alignment="CENTER_RIGHT" contentDisplay="RIGHT" AnchorPane.leftAnchor="400.0" AnchorPane.rightAnchor="0.0" />
+               </children>
+            </AnchorPane>
          </children>
          <padding>
             <Insets bottom="5.0" left="10.0" top="5.0" />
@@ -148,4 +119,11 @@
         </menus>
       </MenuBar>
    </top>
+   <left>
+      <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <children>
+            <VBox fx:id="chartFilters" />
+         </children>
+      </AnchorPane>
+   </left>
 </BorderPane>
