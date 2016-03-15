@@ -1,10 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package lotusbidashboard;
 
+import com.google.gson.annotations.SerializedName;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -15,177 +11,108 @@ import javafx.beans.property.StringProperty;
  * @author Jamie
  */
 public class Sales {
+    private IntegerProperty _year;
     
-    //private final IntegerProperty year = new SimpleIntegerProperty();
-    //private final IntegerProperty quarter = new SimpleIntegerProperty();
-    //private final StringProperty region = new SimpleStringProperty();
-    //private final StringProperty vehicle = new SimpleStringProperty();
-    //private final IntegerProperty quantity = new SimpleIntegerProperty();
-    
-    /*
-    public Sales(int QTR, int Quantity, String Region, String Vehicle, int Year){
-        this.quarter.set(QTR);
-        this.quantity.set(Quantity);
-        this.region.set(Region);
-        this.vehicle.set(Vehicle);
-        this.year.set(Year);
-    }
-    */
-    private IntegerProperty year;
-    private int Year;
+    @SerializedName("Year")
+    private int year;
     public int getYear() {
-        return (year != null)? year.get() : Year;
+        return (_year != null)? _year.get() : year;
     }
     public void setYear(int value) {
-        if (year != null) {
-            year.set(value);
+        if (_year != null) {
+            _year.set(value);
         } else {
-            Year = value;
+            year = value;
         }
     }
     public IntegerProperty yearProperty() {
-        if (year == null) {
-            year = new SimpleIntegerProperty(Year);
+        if (_year == null) {
+            _year = new SimpleIntegerProperty(year);
         }
-        return year;
+        return _year;
     }
     
-    private IntegerProperty quarter;
-    private int QTR;
+    private IntegerProperty _quarter;
+    
+    @SerializedName("QTR")
+    private int quarter;
     public int getQTR() {
-        return (quarter != null)? quarter.get() : QTR;
+        return (_quarter != null)? _quarter.get() : quarter;
     }
     public void setQTR(int value) {
-        if (quarter != null) {
-            quarter.set(value);
+        if (_quarter != null) {
+            _quarter.set(value);
         } else {
-            QTR = value;
+            quarter = value;
         }
     }
     public IntegerProperty quarterProperty() {
-        if (quarter == null) {
-            quarter = new SimpleIntegerProperty(QTR);
+        if (_quarter == null) {
+            _quarter = new SimpleIntegerProperty(quarter);
         }
-        return quarter;
+        return _quarter;
     }
     
-    private StringProperty region;
-    private String Region;
+    private StringProperty _region;
+    
+    @SerializedName("Region")
+    private String region;
     public String getRegion() {
-        return (region != null)? region.get() : Region;
+        return (_region != null)? _region.get() : region;
     }
     public void setRegion(String value) {
-        if (region != null) {
-            region.set(value);
+        if (_region != null) {
+            _region.set(value);
         } else {
-            Region = value;
+            region = value;
         }
     }
     public StringProperty regionProperty() {
-        if (region == null) {
-            region = new SimpleStringProperty(Region);
+        if (_region == null) {
+            _region = new SimpleStringProperty(region);
         }
-        return region;
+        return _region;
     }
 
-    private StringProperty vehicle;
-    private String Vehicle;
+    private StringProperty _vehicle;
+    
+    @SerializedName("Vehicle")
+    private String vehicle;
     public String getVehicle() {
-        return (vehicle != null)? vehicle.get() : Vehicle;
+        return (_vehicle != null)? _vehicle.get() : vehicle;
     }
     public void setVehicle(String value) {
-        if (vehicle != null) {
-            vehicle.set(value);
+        if (_vehicle != null) {
+            _vehicle.set(value);
         } else {
-            Vehicle = value;
+            vehicle = value;
         }
     }
     public StringProperty vehicleProperty() {
-        if (vehicle == null) {
-            vehicle = new SimpleStringProperty(Vehicle);
+        if (_vehicle == null) {
+            _vehicle = new SimpleStringProperty(vehicle);
         }
-        return vehicle;
+        return _vehicle;
     }
     
-    private IntegerProperty quantity;
-    private int Quantity;
+    private IntegerProperty _quantity;
+    
+    @SerializedName("Quantity")
+    private int quantity;
     public int getQuantity() {
-        return (quantity != null)? quantity.get() : Quantity;
+        return (_quantity != null)? _quantity.get() : quantity;
     }
     public void setQuantity(int value) {
-        if (quantity != null) {
-            quantity.set(value);
+        if (_quantity != null) {
+            _quantity.set(value);
         } else {
-            Quantity = value;
+            quantity = value;
         }
     }
     public IntegerProperty quantityProperty() {
-        if (quantity == null) {
-            quantity = new SimpleIntegerProperty(Quantity);
+        if (_quantity == null) {
+            _quantity = new SimpleIntegerProperty(quantity);
         }
-        return quantity;
+        return _quantity;
     }
-    
-    /*
-    public void setYear(int year){
-        this.year.set(year);
-    }
-
-    public int getYear(){
-        return this.year.get();
-    }
-    
-    public IntegerProperty yearProperty(){
-        return this.year;
-    }
-    
-
-    public void setQuarter(byte quarter){
-        this.quarter.set(quarter);
-    }
-
-    public int getQuarter(){
-        return this.quarter.get();
-    }
-    
-    public IntegerProperty quarterProperty(){
-        return this.quarter;
-    }
-    
-    public void setRegion(String region){
-        this.region.set(region);
-    }
-
-    public String getRegion(){
-        return this.region.get();
-    }
-    
-    public StringProperty regionProperty(){
-        return this.region;
-    }
-    
-    public void setVehicle(String vehicle){
-        this.vehicle.set(vehicle);
-    }
-
-    public String getVehicle(){
-        return this.vehicle.get();
-    }
-    
-    public StringProperty vehicleProperty(){
-        return this.vehicle;
-    }
-
-    public void setQuantity(int sales){
-        this.quantity.set(sales);
-    }
-
-    public int getQuantity(){
-        return this.quantity.get();
-    }
-    
-    public IntegerProperty quantityProperty(){
-        return this.quantity;
-    }
-    */
 }
