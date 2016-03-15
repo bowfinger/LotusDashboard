@@ -31,9 +31,7 @@ import javafx.stage.Stage;
  * @author Jamie
  */
 public class LoginController implements Initializable {
-    
-    private DashboardController dashboard = new DashboardController();
-    
+        
     @FXML
     PasswordField passwordTextField;
     
@@ -49,7 +47,7 @@ public class LoginController implements Initializable {
     @FXML
     ProgressIndicator progressIndicator;
     
-    private LogInService logInService = new LogInService();
+    private final LogInService logInService = new LogInService();
     
     //DEBUG TO SKIP LOGIN
     private static final boolean ISDEBUG = true;
@@ -57,13 +55,16 @@ public class LoginController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         //set logInTask events
+        logInButton.disableProperty().bind(progressIndicator.visibleProperty());
+        usernameTextField.disableProperty().bind(progressIndicator.visibleProperty());
+        passwordTextField.disableProperty().bind(progressIndicator.visibleProperty());
         logInService.setOnRunning(event ->{
-            logInButton.setDisable(true);
+            //logInButton.setDisable(true);
             progressIndicator.setVisible(true);
         });
         logInService.setOnSucceeded(event ->{
             System.out.println("setOnSucceeded");
-            logInButton.setDisable(false);
+            //logInButton.setDisable(false);
             progressIndicator.setVisible(false);
             if(logInService.getValue().equals(true)){
                 try {
@@ -99,11 +100,7 @@ public class LoginController implements Initializable {
     }
 
     private boolean checkLoginDetails(String user, String pass) {
-        if(user.length() > 0 && pass.length() > 0){
-            return true;
-        }else{
-            return false;
-        }
+        return user.length() > 0 && pass.length() > 0;
     }
 
     private void doLogIn() throws IOException {
@@ -124,5 +121,4 @@ public class LoginController implements Initializable {
         
         stage.show();
     }
-    
 }
