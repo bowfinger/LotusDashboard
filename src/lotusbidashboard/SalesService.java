@@ -15,18 +15,23 @@ import javafx.util.Duration;
  * @author Jamie
  */
 public class SalesService extends ScheduledService<ObservableList<Sales>> {
-
-    //30 second delay on scheduled service
-    //maybe allow delay to be changed via a menu?
-    private static final Duration DELAY = new Duration(30000);
-
+    
     public SalesService(){
-        this.setPeriod(DELAY);
+        this.setPeriod(new Duration(30000));//initialise with 30s delay
     }
-
 
     @Override
     protected Task<ObservableList<Sales>> createTask() {
         return new SalesTask();
+    }
+    
+    //sets ScheduledService delay from settings
+    public void setNewDelay(int delay){
+        super.setDelay(new Duration(delay * 1000));
+    }
+    
+    //gets current delay to populate settings slider
+    public int getDelayAsInt(){
+        return (int)super.getDelay().toSeconds();
     }
 }

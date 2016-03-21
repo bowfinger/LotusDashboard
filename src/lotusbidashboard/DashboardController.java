@@ -1,5 +1,6 @@
 package lotusbidashboard;
 
+import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -21,10 +22,13 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.PieChart;
@@ -32,13 +36,17 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 /**
@@ -46,6 +54,9 @@ import javafx.util.Duration;
  * @author Jamie
  */
 public class DashboardController implements Initializable {
+
+    @FXML
+    private BorderPane rootNode;
 
     @FXML
     private ProgressIndicator myProgressIndicator;
@@ -138,22 +149,30 @@ public class DashboardController implements Initializable {
         pieYearChoiceBox.valueProperty().addListener(new ChangeListener<Integer>() {
             @Override
             public void changed(ObservableValue observable, Integer oldValue, Integer newValue) {
-                pieCompareYearChoiceBox.getItems().setAll(years.stream()
-                        .filter(o -> !o.equals(newValue))
-                        .collect(Collectors.toList()));
-                pieCompareYearChoiceBox.getSelectionModel().selectFirst();
-                System.out.println("pieYearChoiceBoxChangedFired - build pie chart");
-                //build
-                buildPieChart();
+                System.out.println(String.format("Old: %d - New: %d", oldValue, newValue));
+                //null check as lists cleared when updating data source
+                if (newValue != null) {
+                    pieCompareYearChoiceBox.getItems().setAll(years.stream()
+                            .filter(o -> !o.equals(newValue))
+                            .collect(Collectors.toList()));
+                    pieCompareYearChoiceBox.getSelectionModel().selectFirst();
+                    System.out.println("pieYearChoiceBoxChangedFired - build pie chart");
+                    //build
+                    buildPieChart();
+                }
             }
         });
 
         pieCompareYearChoiceBox.valueProperty().addListener(new ChangeListener<Integer>() {
             @Override
             public void changed(ObservableValue observable, Integer oldValue, Integer newValue) {
-                //fire event
-                System.out.println("pieCompareYearChoiceBoxChangedFired - build compare pie chart");
-                buildComparePieChart();
+                //null check as lists cleared when updating data source
+                if (newValue != null) {
+                    //fire event
+                    System.out.println(String.format("Old: %d - New: %d", oldValue, newValue));
+                    System.out.println("pieCompareYearChoiceBoxChangedFired - build compare pie chart");
+                    buildComparePieChart();
+                }
             }
         });
 
@@ -168,13 +187,13 @@ public class DashboardController implements Initializable {
                     veil.setStyle("-fx-background-color: rgba(0, 0, 0, 0.25)");
                     veil.setOpacity(0.8);
                     myProgressIndicator.setVisible(true);
-                    myProgressIndicator.progressProperty().bind(salesService.progressProperty());
+                    //myProgressIndicator.progressProperty().bind(salesService.progressProperty());
                     break;
                 case READY:
                 case SUCCEEDED:
                 case CANCELLED:
                 case FAILED:
-                    myProgressIndicator.progressProperty().unbind();
+                    //myProgressIndicator.progressProperty().unbind();
                     myProgressIndicator.setVisible(false);
                     veil.setVisible(false);
                     setLastUpdated();
@@ -212,48 +231,52 @@ public class DashboardController implements Initializable {
     private void buildPieChart() {
         //clear chart
         mainPieChart.getData().clear();
-        int year = (int) pieYearChoiceBox.getSelectionModel().getSelectedItem();
-        if (year != 0) {
-            Map<String, Integer> list = null;
-            String series = pieSeriesChoiceBox.getSelectionModel().getSelectedItem().toString();
-            System.out.println(series);
+        if (pieYearChoiceBox.getItems().size() > 0) {
+            int year = (int) pieYearChoiceBox.getSelectionModel().getSelectedItem(); //erroring here
+            if (year != 0) {
+                Map<String, Integer> list = null;
+                String series = pieSeriesChoiceBox.getSelectionModel().getSelectedItem().toString();
+                System.out.println("SERIES - " + series);
 
-            mainPieChart.setTitle(String.format("Total sales by %s - %d", series, year));
-            switch (series) {
-                case "Vehicles":
-                    list = filteredData.stream().filter(o -> o.getYear() == year).collect(Collectors.groupingBy(Sales::getVehicle, Collectors.reducing(0, Sales::getQuantity, Integer::sum)));
-                    break;
-                case "Regions":
-                    list = filteredData.stream().filter(o -> o.getYear() == year).collect(Collectors.groupingBy(Sales::getRegion, Collectors.reducing(0, Sales::getQuantity, Integer::sum)));
-                    break;
+                mainPieChart.setTitle(String.format("Total sales by %s - %d", series, year));
+                switch (series) {
+                    case "Vehicles":
+                        list = filteredData.stream().filter(o -> o.getYear() == year).collect(Collectors.groupingBy(Sales::getVehicle, Collectors.reducing(0, Sales::getQuantity, Integer::sum)));
+                        break;
+                    case "Regions":
+                        list = filteredData.stream().filter(o -> o.getYear() == year).collect(Collectors.groupingBy(Sales::getRegion, Collectors.reducing(0, Sales::getQuantity, Integer::sum)));
+                        break;
+                }
+                list.entrySet().stream().forEach((entry) -> {
+                    PieChart.Data pieData = new PieChart.Data(entry.getKey(), entry.getValue());
+                    mainPieChart.getData().add(pieData);
+                });
             }
-            list.entrySet().stream().forEach((entry) -> {
-                PieChart.Data pieData = new PieChart.Data(entry.getKey(), entry.getValue());
-                mainPieChart.getData().add(pieData);
-            });
         }
     }
 
     private void buildComparePieChart() {
         comparePieChart.getData().clear();
-        int year = (int) pieCompareYearChoiceBox.getSelectionModel().getSelectedItem();
-        if (year != 0) {
-            Map<String, Integer> list = null;
-            String series = pieSeriesChoiceBox.getSelectionModel().getSelectedItem().toString();
+        if (pieCompareYearChoiceBox.getItems().size() > 0) {
+            int year = (int) pieCompareYearChoiceBox.getSelectionModel().getSelectedItem();
+            if (year != 0) {
+                Map<String, Integer> list = null;
+                String series = pieSeriesChoiceBox.getSelectionModel().getSelectedItem().toString();
 
-            comparePieChart.setTitle(String.format("Total sales by %s - %d", series, year));
-            switch (series) {
-                case "Vehicles":
-                    list = filteredData.stream().filter(o -> o.getYear() == year).collect(Collectors.groupingBy(Sales::getVehicle, Collectors.reducing(0, Sales::getQuantity, Integer::sum)));
-                    break;
-                case "Regions":
-                    list = filteredData.stream().filter(o -> o.getYear() == year).collect(Collectors.groupingBy(Sales::getRegion, Collectors.reducing(0, Sales::getQuantity, Integer::sum)));
-                    break;
+                comparePieChart.setTitle(String.format("Total sales by %s - %d", series, year));
+                switch (series) {
+                    case "Vehicles":
+                        list = filteredData.stream().filter(o -> o.getYear() == year).collect(Collectors.groupingBy(Sales::getVehicle, Collectors.reducing(0, Sales::getQuantity, Integer::sum)));
+                        break;
+                    case "Regions":
+                        list = filteredData.stream().filter(o -> o.getYear() == year).collect(Collectors.groupingBy(Sales::getRegion, Collectors.reducing(0, Sales::getQuantity, Integer::sum)));
+                        break;
+                }
+                list.entrySet().stream().forEach((entry) -> {
+                    PieChart.Data pieData = new PieChart.Data(entry.getKey(), entry.getValue());
+                    comparePieChart.getData().add(pieData);
+                });
             }
-            list.entrySet().stream().forEach((entry) -> {
-                PieChart.Data pieData = new PieChart.Data(entry.getKey(), entry.getValue());
-                comparePieChart.getData().add(pieData);
-            });
         }
     }
 
@@ -262,10 +285,9 @@ public class DashboardController implements Initializable {
         //NB - might need to change order
 
         //get current selected value
-        int selectedValue = 0;
+        int selectedIndex = -1;
         if (pieYearChoiceBox.getItems().size() > 0) {
-            System.out.println(pieYearChoiceBox.getSelectionModel().getSelectedItem().getClass().getName());
-            selectedValue = (int) pieYearChoiceBox.getSelectionModel().getSelectedItem();
+            selectedIndex = pieYearChoiceBox.getSelectionModel().getSelectedIndex();
         }
 
         //combine new data with old to get any additional values using hashset
@@ -274,27 +296,27 @@ public class DashboardController implements Initializable {
         years.stream().forEach(o -> combinedList.add(o));
 
         pieYearChoiceBox.getItems().setAll(combinedList);
-        if (selectedValue == 0) {
+        if (selectedIndex == -1) {
             pieYearChoiceBox.getSelectionModel().selectFirst();
         } else {
-            pieYearChoiceBox.getSelectionModel().select(selectedValue);
+            pieYearChoiceBox.getSelectionModel().select(selectedIndex);
         }
 
         //second year selection
-        if (selectedValue != 0) {
-            combinedList.remove(selectedValue);
-
-            selectedValue = 0;
-            if (pieCompareYearChoiceBox.getItems().size() > 0) {
-                selectedValue = (int) pieCompareYearChoiceBox.getSelectionModel().getSelectedItem();
-            }
-            pieCompareYearChoiceBox.getItems().setAll(combinedList);
-            if (selectedValue == 0) {
-                pieCompareYearChoiceBox.getSelectionModel().selectFirst();
-            } else {
-                pieCompareYearChoiceBox.getSelectionModel().select(selectedValue);
-            }
-        }
+//        if (selectedValue != 0) {
+//            combinedList.remove(selectedValue);
+//
+//            selectedValue = 0;
+//            if (pieCompareYearChoiceBox.getItems().size() > 0) {
+//                selectedValue = (int) pieCompareYearChoiceBox.getSelectionModel().getSelectedItem();
+//            }
+//            pieCompareYearChoiceBox.getItems().setAll(combinedList);
+//            if (selectedValue == 0) {
+//                pieCompareYearChoiceBox.getSelectionModel().selectFirst();
+//            } else {
+//                pieCompareYearChoiceBox.getSelectionModel().select(selectedValue);
+//            }
+//        }
     }
 
     private void buildBarChart() {
@@ -424,7 +446,6 @@ public class DashboardController implements Initializable {
             CheckBox cb = new CheckBox(list.get(index).toString());
             cb.setSelected(true);
             cb.setOnAction(e -> {
-
                 filterData();
             });
             checkBoxes.add(cb);
@@ -462,36 +483,13 @@ public class DashboardController implements Initializable {
         salesCol.setCellValueFactory(new PropertyValueFactory("Quantity"));
 
         dataTable.getColumns().addAll(yearCol, qtrCol, modelCol, regionCol, salesCol);
-        //dataTable.itemsProperty().bind(salesService.valueProperty());
     }
 
-//    private void filterData() {
-//        
-//        List<Sales> list = new ArrayList<Sales>();
-//        
-//        for(CheckBox year : yearCheckboxes){
-//            if(year.isSelected()){
-//                list.addAll(data.stream().filter(o -> Integer.toString(o.getYear()).equals(year.getText())).collect(Collectors.toList()));
-//            }
-//        }
-//        
-//        for(CheckBox region : regionCheckboxes){
-//            if(region.isSelected()){
-//                list = list.stream().filter(o -> o.getRegion().equals(region.getText())).collect(Collectors.toList());
-//            }
-//        }
-//        
-//        for(CheckBox quarter : quarterCheckboxes){
-//            if(quarter.isSelected()){
-//                list = list.stream().filter(o -> Integer.toString(o.getQTR()).equals(quarter.getText())).collect(Collectors.toList());
-//            }
-//        }
-//        System.out.println("filtered data size " + list.size());
-//        
-//    }
     public void filterData() {
-        //ObservableList<Sales> filteredData = FXCollections.observableArrayList(); 
+
         filteredData.clear();
+
+        //filters all data received from service using global checkboxes
         data.stream().forEach((Sales s) -> {
             boolean foundYear = false;
             boolean foundVehicle = false;
@@ -523,7 +521,6 @@ public class DashboardController implements Initializable {
                     }
                 }
             }
-            //System.out.println(s + " = " + foundYear +" : "+foundVehicle +" : "+ foundRegion  +" : "+ foundQuarter); 
             if (foundYear && foundVehicle && foundRegion && foundQuarter) {
                 filteredData.add(s);
             }
@@ -536,4 +533,27 @@ public class DashboardController implements Initializable {
         bindTable();
     }
 
+    @FXML
+    public void showAbout(ActionEvent event) throws IOException {
+        Stage stage = new Stage();
+        Parent root = FXMLLoader.load(getClass().getResource("AboutFXML.fxml"));
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
+        stage.setTitle("Lotus Dashboard About");
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.initOwner(rootNode.getScene().getWindow());
+        stage.show();
+    }
+
+    @FXML
+    public void showSettings(ActionEvent event) throws IOException {
+        Stage stage = new Stage();
+        Parent root = FXMLLoader.load(getClass().getResource("AboutFXML.fxml"));
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
+        stage.setTitle("Lotus Dashboard Settings");
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.initOwner(rootNode.getScene().getWindow());
+        stage.show();
+    }
 }
