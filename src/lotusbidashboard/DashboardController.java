@@ -348,15 +348,15 @@ public class DashboardController implements Initializable {
         lineChart.getData().clear();
         lineChart.getXAxis().setLabel("Vehicle");
 
-        years.stream().map((year) -> {
+        vehicles.stream().map((vehicle) -> {
             XYChart.Series series = new XYChart.Series();
-            series.setName(Integer.toString(year));
-            Map<String, Integer> totalSalesByYear = filteredData.stream()
-                    .filter(o -> o.getYear() == year)
-                    .collect(Collectors.groupingBy(Sales::getVehicle, Collectors.reducing(0, Sales::getQuantity, Integer::sum)));
+            series.setName(vehicle);
+            Map<Integer, Integer> totalSalesByYear = filteredData.stream()
+                    .filter(o -> o.getVehicle().equals(vehicle))
+                    .collect(Collectors.groupingBy(Sales::getYear, Collectors.reducing(0, Sales::getQuantity, Integer::sum)));
 
             totalSalesByYear.entrySet().stream().map((entry) -> {
-                XYChart.Data chartData = new XYChart.Data<>(entry.getKey(), entry.getValue());
+                XYChart.Data chartData = new XYChart.Data<>(entry.getKey().toString(), entry.getValue());
                 chartData.setNode(new HoveredThresholdNode(entry.getValue()));
                 return chartData;
             }).forEach((chartData) -> {
