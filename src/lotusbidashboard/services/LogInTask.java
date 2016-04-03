@@ -1,15 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package lotusbidashboard;
+package lotusbidashboard.services;
 
 import javafx.concurrent.Task;
 
 /**
  *
- * @author Jamie
+ * @author Jamie Deville
  */
 public class LogInTask extends Task<Boolean> {
     

@@ -1,10 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package lotusbidashboard;
 
+import lotusbidashboard.services.LogInService;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -26,9 +22,8 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 /**
- * FXML Controller class
  *
- * @author Jamie
+ * @author Jamie Deville
  */
 public class LoginController implements Initializable {
         
@@ -49,8 +44,8 @@ public class LoginController implements Initializable {
     
     private final LogInService logInService = new LogInService();
     
-    //DEBUG TO SKIP LOGIN
-    private static final boolean ISDEBUG = true;
+    //DEBUG TO SKIP LOGIN - set to false for final
+    private static final boolean ISDEBUG = false;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -59,12 +54,9 @@ public class LoginController implements Initializable {
         usernameTextField.disableProperty().bind(progressIndicator.visibleProperty());
         passwordTextField.disableProperty().bind(progressIndicator.visibleProperty());
         logInService.setOnRunning(event ->{
-            //logInButton.setDisable(true);
             progressIndicator.setVisible(true);
         });
         logInService.setOnSucceeded(event ->{
-            System.out.println("setOnSucceeded");
-            //logInButton.setDisable(false);
             progressIndicator.setVisible(false);
             if(logInService.getValue().equals(true)){
                 try {
@@ -80,11 +72,8 @@ public class LoginController implements Initializable {
 
     public void onLogInButtonClick(ActionEvent event){
         
-        System.out.println("onLogInButtonClick");
-        
         String user = usernameTextField.getText();
         String pass = passwordTextField.getText();
-        
         
         //auto set login no matter what
         if(ISDEBUG){
@@ -96,15 +85,18 @@ public class LoginController implements Initializable {
             logInService.setCredentials(user, pass);
             logInService.reset();
             logInService.start();
+        }else{
+            errorLabel.setText("Please enter you credentials");
         }
     }
 
+    //only checks length of text
+    //will require extra validation for production
     private boolean checkLoginDetails(String user, String pass) {
         return user.length() > 0 && pass.length() > 0;
     }
 
     private void doLogIn() throws IOException {
-        System.out.println("doLogIn");
         Stage stage =(Stage)this.logInButton.getScene().getWindow();
         Parent root = FXMLLoader.load(getClass().getResource("DashboardFXML.fxml"));
         Scene scene = new Scene(root);

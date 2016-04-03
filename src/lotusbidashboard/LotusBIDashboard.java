@@ -1,19 +1,15 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package lotusbidashboard;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 /**
  *
- * @author Jamie
+ * @author Jamie Deville, John Harvey and Sam Griffiths
  */
 public class LotusBIDashboard extends Application {
     
@@ -27,6 +23,8 @@ public class LotusBIDashboard extends Application {
         
         Parent root = FXMLLoader.load(getClass().getResource("LoginFXML.fxml"));
         Scene scene = new Scene(root);
+        stage.getIcons().add(new Image(getClass().getResourceAsStream("resources/lotusLogo.png")));
+        stage.setTitle("Lotus BI Dashboard");
         stage.setScene(scene);
         stage.show();
     }

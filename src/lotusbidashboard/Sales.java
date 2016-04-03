@@ -1,10 +1,6 @@
 package lotusbidashboard;
 
 import com.google.gson.annotations.SerializedName;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -12,9 +8,9 @@ import javafx.beans.property.StringProperty;
 
 /**
  *
- * @author Jamie
+ * @author Jamie Deville
  */
-public class Sales {
+public class Sales{
     private IntegerProperty _year;
     
     @SerializedName("Year")
@@ -118,5 +114,13 @@ public class Sales {
             _quantity = new SimpleIntegerProperty(quantity);
         }
         return _quantity;
+    }
+    
+    public boolean isEqualTo(Sales compareSales) {
+        return this.getQTR() == compareSales.getQTR() &&
+                this.getQuantity() == compareSales.getQuantity() &&
+                this.getYear() == compareSales.getYear() &&
+                this.getRegion().equals(compareSales.getRegion()) &&
+                this.getVehicle().equals(compareSales.getVehicle());
     }
 }

@@ -1,9 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package lotusbidashboard;
+package lotusbidashboard.data.parser;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -12,10 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import lotusbidashboard.Sales;
 
 /**
  *
- * @author Jamie
+ * @author Jamie Deville
  */
 public class SalesDataParser {
     public ObservableList<Sales> parseJSONData(String json) {

@@ -8,13 +8,16 @@ import javafx.scene.paint.Color;
 
 /**
  *
- * @author Jamie
+ * @author Jamie Deville - 511202
+ * 
+ * Creates a hover label for chart nodes using an altered version of code
+ * found at: https://gist.github.com/jewelsea/4681797
  */
-public class HoveredThresholdNode extends StackPane {
-    HoveredThresholdNode(int value) {
-      setPrefSize(15, 15);
+public class ChartDataHoverLabel extends StackPane {
+    public ChartDataHoverLabel(int value) {
+      super.setPrefSize(15, 15);
 
-      final Label label = createDataThresholdLabel(value);
+      final Label label = createHoverLabel(value);
 
       setOnMouseEntered((MouseEvent mouseEvent) -> {
           getChildren().setAll(label);
@@ -23,11 +26,10 @@ public class HoveredThresholdNode extends StackPane {
       });
       setOnMouseExited((MouseEvent mouseEvent) -> {
           getChildren().clear();
-          //setCursor(Cursor.CROSSHAIR);
       });
     }
 
-    private Label createDataThresholdLabel(int value) {
+    private Label createHoverLabel(int value) {
       final Label label = new Label(value + "");
       label.getStyleClass().addAll("default-color0", "chart-line-symbol", "chart-series-line");
       label.setStyle("-fx-font-size: 20; -fx-font-weight: bold;");

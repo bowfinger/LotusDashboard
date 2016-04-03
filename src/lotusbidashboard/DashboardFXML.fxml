@@ -6,150 +6,316 @@
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ProgressIndicator?>
-<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="rootNode" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lotusbidashboard.DashboardController">
-   <bottom>
-      <HBox prefHeight="11.0" prefWidth="600.0" BorderPane.alignment="CENTER">
-         <children>
-            <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+<StackPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lotusbidashboard.DashboardController">
+   <children>
+      <BorderPane fx:id="rootNode" scaleShape="false">
+         <top>
+            <MenuBar minHeight="25.0" prefHeight="25.0" BorderPane.alignment="CENTER">
+               <menus>
+                  <Menu text="_File">
+                     <items>
+                        <MenuItem mnemonicParsing="false" onAction="#onImportDataClick" text="Import Projected Data" />
+                        <MenuItem mnemonicParsing="false" onAction="#onExportDataClick" text="Export Data" />
+                        <MenuItem mnemonicParsing="false" onAction="#onExitClick" text="Close" />
+                     </items>
+                  </Menu>
+                  <Menu text="_Settings">
+                     <items>
+                        <MenuItem mnemonicParsing="false" onAction="#showSettings" text="Change Settings" />
+                     </items>
+                  </Menu>
+                  <Menu text="_Help">
+                     <items>
+                        <MenuItem mnemonicParsing="false" onAction="#showAbout" text="About" />
+                     </items>
+                  </Menu>
+               </menus>
+            </MenuBar>
+         </top>
+         <left>
+            <AnchorPane BorderPane.alignment="CENTER">
                <children>
-                  <CheckBox fx:id="autoUpdateCheck" mnemonicParsing="false" onAction="#onAutoUpdateCheckChanged" prefHeight="17.0" prefWidth="90.0" selected="true" text="Auto update" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                  <Label fx:id="lastUpdatedLabel" alignment="CENTER_RIGHT" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="290.0" AnchorPane.topAnchor="0.0">
-                     <padding>
-                        <Insets left="10.0" />
-                     </padding>
-                  </Label>
-                  <Label fx:id="sysTimeLabel" alignment="CENTER_RIGHT" contentDisplay="RIGHT" AnchorPane.leftAnchor="400.0" AnchorPane.rightAnchor="0.0" />
+                  <Separator minWidth="-Infinity" orientation="VERTICAL" prefWidth="1.0" rotate="180.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                  <TitledPane alignment="CENTER" animated="false" collapsible="false" text="Global Filters" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <content>
+                      <AnchorPane maxHeight="1.7976931348623157E308">
+                           <children>
+                              <VBox fx:id="chartFilters" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </TitledPane>
+                  <TitledPane alignment="CENTER" animated="false" collapsible="false" text="Statistics" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                    <content>
+                      <AnchorPane>
+                           <children>
+                              <GridPane fx:id="statsGrid" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="113.0" minWidth="10.0" prefWidth="113.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="84.0" minWidth="10.0" prefWidth="65.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <Label text="Min" />
+                                    <Label text="Max" GridPane.rowIndex="1" />
+                                    <Label text="Average" GridPane.rowIndex="2" />
+                                    <Label text="Total" GridPane.rowIndex="3" />
+                                    <Label text="Standard Deviation" GridPane.rowIndex="4" />
+                                    <Label fx:id="statsMinLabel" GridPane.columnIndex="1" />
+                                    <Label fx:id="statsMaxLabel" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    <Label fx:id="statsAverageLabel" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                    <Label fx:id="statsTotalLabel" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                    <Label fx:id="statsSdLabel" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                 </children>
+                              </GridPane>
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </TitledPane>
                </children>
             </AnchorPane>
-         </children>
-         <padding>
-            <Insets bottom="5.0" left="10.0" top="5.0" />
-         </padding></HBox>
-   </bottom>
-   <center>
-      <StackPane prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-         <children>
-            <SplitPane dividerPositions="0.7527173913043478" orientation="VERTICAL" prefHeight="371.0" prefWidth="520.0">
-               <items>
-                  <TabPane tabClosingPolicy="UNAVAILABLE">
-                    <tabs>
-                      <Tab text="Bar Chart">
-                        <content>
-                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                                 <children>
-                                    <BarChart fx:id="barChart" animated="false">
-                                      <xAxis>
-                                        <CategoryAxis side="BOTTOM" />
-                                      </xAxis>
-                                      <yAxis>
-                                        <NumberAxis side="LEFT" />
-                                      </yAxis>
-                                    </BarChart>
-                                 </children></AnchorPane>
-                        </content>
-                      </Tab>
-                      <Tab text="Line Chart">
-                        <content>
-                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                                 <children>
-                                    <LineChart fx:id="lineChart" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                      <xAxis>
-                                        <CategoryAxis side="BOTTOM" />
-                                      </xAxis>
-                                      <yAxis>
-                                        <NumberAxis side="LEFT" />
-                                      </yAxis>
-                                    </LineChart>
-                                 </children></AnchorPane>
-                        </content>
-                      </Tab>
-                        <Tab text="Pie Chart">
-                          <content>
-                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                                 <children>
-                                    <FlowPane prefHeight="200.0" prefWidth="200.0">
+         </left>
+         <bottom>
+            <AnchorPane BorderPane.alignment="CENTER">
+               <children>
+                  <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                     </rowConstraints>
+                     <children>
+                        <CheckBox fx:id="autoUpdateCheck" mnemonicParsing="false" onAction="#onAutoUpdateCheckChanged" selected="true" text="Auto update" GridPane.halignment="LEFT">
+                           <GridPane.margin>
+                              <Insets left="10.0" />
+                           </GridPane.margin>
+                        </CheckBox>
+                        <Label fx:id="lastUpdatedLabel" alignment="CENTER_RIGHT" contentDisplay="CENTER" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.halignment="CENTER">
+                           <padding>
+                              <Insets left="10.0" />
+                           </padding>
+                        </Label>
+                        <Label fx:id="sysTimeLabel" alignment="CENTER_RIGHT" contentDisplay="RIGHT" GridPane.columnIndex="2" GridPane.halignment="RIGHT">
+                           <GridPane.margin>
+                              <Insets right="10.0" />
+                           </GridPane.margin>
+                        </Label>
+                     </children>
+                  </GridPane>
+                  <Separator prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+               </children>
+            </AnchorPane>
+         </bottom>
+         <right>
+            <AnchorPane>
+               <children>
+                  <VBox maxHeight="1.7976931348623157E308" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <children>
+                        <AnchorPane maxHeight="1.7976931348623157E308">
+                           <children>
+                              <TableView fx:id="dataTable" maxHeight="1.7976931348623157E308" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                           </children>
+                        </AnchorPane>
+                        <AnchorPane maxHeight="1.7976931348623157E308">
+                           <children>
+                              <TitledPane alignment="CENTER" animated="false" collapsible="false" text="Projected Data" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                                 <content>
+                                    <VBox alignment="CENTER">
                                        <children>
-                                          <PieChart fx:id="mainPieChart" />
-                                          <PieChart fx:id="comparePieChart" visible="false" />
-                                       </children>
-                                    </FlowPane>
-                                    <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
-                                       <children>
-                                          <Label text="Series" />
-                                          <ChoiceBox fx:id="pieSeriesChoiceBox" prefWidth="150.0" />
-                                          <Label text="Year" />
-                                          <ChoiceBox fx:id="pieYearChoiceBox" prefWidth="150.0" />
-                                          <CheckBox fx:id="pieCompareCheckBox" mnemonicParsing="false" text="Compare">
+                                          <HBox alignment="CENTER_LEFT">
+                                             <children>
+                                                <Label prefWidth="60.0" text="Year" />
+                                                <ComboBox fx:id="addYearComboBox" editable="true" maxWidth="1.7976931348623157E308" />
+                                             </children>
+                                             <opaqueInsets>
+                                                <Insets />
+                                             </opaqueInsets>
+                                             <padding>
+                                                <Insets bottom="2.5" top="2.5" />
+                                             </padding>
+                                          </HBox>
+                                          <HBox alignment="CENTER_LEFT">
+                                             <children>
+                                                <Label prefWidth="60.0" text="Quarter" />
+                                                <ComboBox fx:id="addQuarterComboBox" maxWidth="1.7976931348623157E308" />
+                                             </children>
+                                             <padding>
+                                                <Insets bottom="2.5" top="2.5" />
+                                             </padding>
+                                          </HBox>
+                                          <HBox alignment="CENTER_LEFT">
+                                             <children>
+                                                <Label prefWidth="60.0" text="Vehicle" />
+                                                <ComboBox fx:id="addVehicleComboBox" editable="true" maxWidth="1.7976931348623157E308" />
+                                             </children>
+                                             <padding>
+                                                <Insets bottom="2.5" top="2.5" />
+                                             </padding>
+                                          </HBox>
+                                          <HBox alignment="CENTER_LEFT">
+                                             <children>
+                                                <Label prefWidth="60.0" text="Region" />
+                                                <ComboBox fx:id="addRegionComboBox" maxWidth="1.7976931348623157E308" />
+                                             </children>
+                                             <padding>
+                                                <Insets bottom="2.5" top="2.5" />
+                                             </padding>
+                                          </HBox>
+                                          <HBox alignment="CENTER_LEFT">
+                                             <children>
+                                                <Label prefWidth="60.0" text="Quantity" />
+                                                <TextField fx:id="addQuantityTextField" maxWidth="1.7976931348623157E308" />
+                                             </children>
+                                             <padding>
+                                                <Insets bottom="2.5" top="2.5" />
+                                             </padding>
+                                          </HBox>
+                                          <Button fx:id="addProjectedButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onAddProjectedButtonClick" text="Add Data">
                                              <VBox.margin>
-                                                <Insets bottom="10.0" top="10.0" />
+                                                <Insets bottom="2.5" top="2.5" />
                                              </VBox.margin>
-                                          </CheckBox>
-                                          <ChoiceBox fx:id="pieCompareYearChoiceBox" disable="true" prefWidth="150.0" />
+                                          </Button>
+                                          <Button fx:id="importProjectedButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onImportProjectedButtonClick" text="Import Data">
+                                             <VBox.margin>
+                                                <Insets bottom="2.5" top="2.5" />
+                                             </VBox.margin>
+                                          </Button>
+                                          <Button fx:id="clearProjectedButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onClearProjectedButtonClick" text="Clear Data">
+                                             <VBox.margin>
+                                                <Insets bottom="2.5" top="2.5" />
+                                             </VBox.margin>
+                                          </Button>
+                                          <Label fx:id="importDataMessageLabel" alignment="CENTER">
+                                             <VBox.margin>
+                                                <Insets bottom="2.5" top="2.5" />
+                                             </VBox.margin>
+                                          </Label>
                                        </children>
                                     </VBox>
+                                 </content>
+                              </TitledPane>
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </VBox>
+               </children>
+            </AnchorPane>
+         </right>
+         <center>
+            <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+               <children>
+                  <TabPane tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <tabs>
+                        <Tab text="Bar Chart">
+                           <content>
+                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <BarChart fx:id="barChart" animated="false" title="Total Sales per Vehicle - by Year" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+                                       <xAxis>
+                                          <CategoryAxis side="BOTTOM" />
+                                       </xAxis>
+                                       <yAxis>
+                                          <NumberAxis side="LEFT" />
+                                       </yAxis>
+                                    </BarChart>
                                  </children>
                               </AnchorPane>
+                           </content>
+                        </Tab>
+                        <Tab text="Line Chart">
+                           <content>
+                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <LineChart fx:id="lineChart" title="Total Sales per Year - by Vehicle" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+                                       <xAxis>
+                                          <CategoryAxis side="BOTTOM" />
+                                       </xAxis>
+                                       <yAxis>
+                                          <NumberAxis side="LEFT" />
+                                       </yAxis>
+                                    </LineChart>
+                                 </children>
+                              </AnchorPane>
+                           </content>
+                        </Tab>
+                        <Tab text="Pie Chart">
+                           <content>
+                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <HBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                       <children>
+                                          <PieChart fx:id="mainPieChart" maxHeight="500.0" minHeight="100.0" minWidth="100.0" />
+                                          <PieChart fx:id="comparePieChart" maxHeight="500.0" minHeight="100.0" minWidth="100.0" visible="false" />
+                                          <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                                             <children>
+                                                <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+                                                   <children>
+                                                      <Label text="Series" />
+                                                      <ChoiceBox fx:id="pieSeriesChoiceBox" prefWidth="150.0" />
+                                                      <Label text="Year" />
+                                                      <ChoiceBox fx:id="pieYearChoiceBox" prefWidth="150.0" />
+                                                      <CheckBox fx:id="pieCompareCheckBox" mnemonicParsing="false" text="Compare">
+                                                         <VBox.margin>
+                                                            <Insets bottom="10.0" top="10.0" />
+                                                         </VBox.margin>
+                                                      </CheckBox>
+                                                      <ChoiceBox fx:id="pieCompareYearChoiceBox" disable="true" prefWidth="150.0" />
+                                                   </children>
+                                                </VBox>
+                                             </children>
+                                          </AnchorPane>
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </AnchorPane>
+                           </content>
+                        </Tab>
+                        <Tab text="Box Plot">
+                          <content>
+                            <AnchorPane fx:id="canvasWrapper" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
                           </content>
                         </Tab>
-                    </tabs>
+                     </tabs>
                   </TabPane>
-
-                        <TableView fx:id="dataTable" prefHeight="200.0" prefWidth="200.0">
-                          <columns>
-                          </columns>
-                        </TableView>
-               </items>
-            </SplitPane>
-            <Region fx:id="veil" prefHeight="200.0" prefWidth="200.0" visible="false" />
-            <ProgressIndicator fx:id="myProgressIndicator" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" visible="false" />
-         </children>
-      </StackPane>
-   </center>
-   <top>
-      <MenuBar BorderPane.alignment="CENTER">
-        <menus>
-          <Menu mnemonicParsing="false" text="File">
-            <items>
-              <MenuItem mnemonicParsing="false" text="Close" />
-            </items>
-          </Menu>
-          <Menu mnemonicParsing="false" text="Edit">
-            <items>
-              <MenuItem mnemonicParsing="false" text="Delete" />
-            </items>
-          </Menu>
-          <Menu mnemonicParsing="false" text="Help">
-            <items>
-              <MenuItem mnemonicParsing="false" onAction="#showAbout" text="About" />
-            </items>
-          </Menu>
-        </menus>
-      </MenuBar>
-   </top>
-   <left>
-      <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-         <children>
-            <VBox fx:id="chartFilters" />
-         </children>
-      </AnchorPane>
-   </left>
-</BorderPane>
+               </children>
+            </AnchorPane>
+         </center>
+      </BorderPane>
+      <Region fx:id="veil" prefHeight="200.0" prefWidth="200.0" visible="false" />
+      <ProgressIndicator fx:id="myProgressIndicator" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" visible="false" />
+   </children>
+</StackPane>

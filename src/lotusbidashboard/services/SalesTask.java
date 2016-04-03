@@ -1,9 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package lotusbidashboard;
+package lotusbidashboard.services;
 
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -12,9 +7,11 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Scanner;
+import lotusbidashboard.Sales;
+import lotusbidashboard.data.parser.SalesDataParser;
 /**
  *
- * @author Jamie
+ * @author Jamie Deville
  */
 class SalesTask extends Task<ObservableList<Sales>> {
 
@@ -83,6 +80,11 @@ class SalesTask extends Task<ObservableList<Sales>> {
     @Override
     protected ObservableList<Sales> call() throws Exception {
         String data = getData();
+        //data = "";
+        if(data.isEmpty()){
+            System.out.println("THROWN ERROR");
+            throw new Exception("Web Service Offline");
+        }
         
         //only for testing purposes
         System.out.println(data);
