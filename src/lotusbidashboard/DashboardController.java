@@ -134,21 +134,27 @@ public class DashboardController implements Initializable {
 
     @FXML
     private Label importDataMessageLabel;
-    
+
     @FXML
     private Label statsMinLabel;
-    
+
     @FXML
     private Label statsMaxLabel;
-    
+
     @FXML
     private Label statsAverageLabel;
-    
+
     @FXML
     private Label statsTotalLabel;
-    
+
     @FXML
     private Label statsSdLabel;
+
+    @FXML
+    private ChoiceBox lineSeriesChoiceBox;
+
+    @FXML
+    private ChoiceBox barSeriesChoiceBox;
 
     private final ResizableCanvas boxPlotCanvas = new ResizableCanvas();
     private final BoxPlotDrawer bpd = new BoxPlotDrawer();
@@ -168,36 +174,38 @@ public class DashboardController implements Initializable {
     private final ObservableList<Sales> filteredData = FXCollections.observableArrayList();
     private final ObservableList<Sales> projectedData = FXCollections.observableArrayList();
     private final Stats statsObject = new Stats();
-    
+
     private List<Integer> years;
     private List<String> vehicles;
     private List<String> regions;
     private final List<String> quarters = Arrays.asList("Q1", "Q2", "Q3", "Q4");
     private final List<String> chartSeriesList = Arrays.asList("Vehicles", "Regions");
+    private final List<String> barSeriesList = Arrays.asList("Years", "Regions");
 
     private List<CheckBox> yearCheckboxes = new ArrayList<>();
     private List<CheckBox> vehicleCheckboxes = new ArrayList<>();
     private List<CheckBox> regionCheckboxes = new ArrayList<>();
     private List<CheckBox> quarterCheckboxes = new ArrayList<>();
-    
+
     private final static String DECIMAL_FORMAT_2DP = "%.2f";
 
     /**
-     * All bindings and static UI collections set here.
-     * ScheduledService events hooked into.
+     * All bindings and static UI collections set here. ScheduledService events
+     * hooked into.
+     *
      * @param url
-     * @param rb 
+     * @param rb
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-                
+
         //bind stats - uses 2 decimal places (optional) as format
         statsMinLabel.textProperty().bind(statsObject.minProperty().asString(DECIMAL_FORMAT_2DP));
         statsMaxLabel.textProperty().bind(statsObject.maxProperty().asString(DECIMAL_FORMAT_2DP));
         statsAverageLabel.textProperty().bind(statsObject.averageProperty().asString(DECIMAL_FORMAT_2DP));
         statsTotalLabel.textProperty().bind(statsObject.totalProperty().asString(DECIMAL_FORMAT_2DP));
         statsSdLabel.textProperty().bind(statsObject.sdvProperty().asString(DECIMAL_FORMAT_2DP));
-        
+
         //set quarters
         addQuarterComboBox.getItems().addAll(quarters);
 
@@ -221,6 +229,28 @@ public class DashboardController implements Initializable {
         }));
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.play();
+
+        //bar chart onchange listeners
+        barSeriesChoiceBox.getItems().setAll(barSeriesList);
+        barSeriesChoiceBox.getSelectionModel().selectFirst();
+
+        barSeriesChoiceBox.valueProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                buildBarChart();
+            }
+        });
+
+        //line chart on change listeners
+        lineSeriesChoiceBox.getItems().setAll(chartSeriesList);
+        lineSeriesChoiceBox.getSelectionModel().selectFirst();
+
+        lineSeriesChoiceBox.valueProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                buildLineChart();
+            }
+        });
 
         //Pie Chart onchange listeners
         pieSeriesChoiceBox.getItems().setAll(chartSeriesList);
@@ -367,8 +397,8 @@ public class DashboardController implements Initializable {
     }
 
     /**
-     * Builds second Pie Chart based on globally filtered data.
-     * Only visible if "compare" option is checked.
+     * Builds second Pie Chart based on globally filtered data. Only visible if
+     * "compare" option is checked.
      */
     private void buildComparePieChart() {
         comparePieChart.getData().clear();
@@ -397,8 +427,8 @@ public class DashboardController implements Initializable {
     }
 
     /**
-     * Sets choice boxes for local Pie Chart filters.
-     * Utilises HashMap to ensure no duplicates are in list.
+     * Sets choice boxes for local Pie Chart filters. Utilises HashMap to ensure
+     * no duplicates are in list.
      */
     private void bindPieChartChoiceBoxes() {
         //get current selected value
@@ -421,63 +451,117 @@ public class DashboardController implements Initializable {
     }
 
     /**
-     * Builds Bar Chart based on filtered data.
-     * Iterates over all year values to ensure chart data and series
-     * are consistent.
-     * Also adds custom hover label for data nodes.
+     * Builds Bar Chart based on filtered data. Iterates over all year/region
+     * values to ensure chart data and series are consistent. Also adds custom
+     * hover label for data nodes.
      */
     private void buildBarChart() {
-        //clear charts 
+        //clear chart
         barChart.getData().clear();
 
-        years.stream().map((year) -> {
-            XYChart.Series series = new XYChart.Series();
-            series.setName(Integer.toString(year));
-            Map<String, Integer> totalSalesByYear = filteredData.stream()
-                    .filter(o -> o.getYear() == year)
-                    .collect(Collectors.groupingBy(Sales::getVehicle, Collectors.reducing(0, Sales::getQuantity, Integer::sum)));
+        String seriesName = barSeriesChoiceBox.getSelectionModel().getSelectedItem().toString();
+        barChart.setTitle(String.format("Total Sales per Vehicle - by %s", seriesName));
+        //barChart.getXAxis().setLabel("Years");
+        barChart.getYAxis().setLabel("Units Sold");
 
-            totalSalesByYear.entrySet().stream().map((entry) -> {
-                XYChart.Data chartData = new XYChart.Data<>(entry.getKey(), entry.getValue());
-                chartData.setNode(new ChartDataHoverLabel(entry.getValue()));
-                return chartData;
-            }).forEach((chartData) -> {
-                series.getData().add(chartData);
-            });
-            return series;
-        }).forEach((series) -> {
-            barChart.getData().add(series);
-        });
+        switch (seriesName) {
+            case "Years":
+                years.stream().map((year) -> {
+                    XYChart.Series series = new XYChart.Series();
+                    series.setName(Integer.toString(year));
+                    Map<String, Integer> totalSalesByYear = filteredData.stream()
+                            .filter(o -> o.getYear() == year)
+                            .collect(Collectors.groupingBy(Sales::getVehicle, Collectors.reducing(0, Sales::getQuantity, Integer::sum)));
+
+                    totalSalesByYear.entrySet().stream().map((entry) -> {
+                        XYChart.Data chartData = new XYChart.Data<>(entry.getKey(), entry.getValue());
+                        chartData.setNode(new ChartDataHoverLabel(entry.getValue()));
+                        return chartData;
+                    }).forEach((chartData) -> {
+                        series.getData().add(chartData);
+                    });
+                    return series;
+                }).forEach((series) -> {
+                    barChart.getData().add(series);
+                });
+                break;
+            case "Regions":
+                regions.stream().map((region) -> {
+                    XYChart.Series series = new XYChart.Series();
+                    series.setName(region);
+                    Map<String, Integer> totalSalesByYear = filteredData.stream()
+                            .filter(o -> o.getRegion().equals(region))
+                            .collect(Collectors.groupingBy(Sales::getVehicle, Collectors.reducing(0, Sales::getQuantity, Integer::sum)));
+
+                    totalSalesByYear.entrySet().stream().map((entry) -> {
+                        XYChart.Data chartData = new XYChart.Data<>(entry.getKey(), entry.getValue());
+                        chartData.setNode(new ChartDataHoverLabel(entry.getValue()));
+                        return chartData;
+                    }).forEach((chartData) -> {
+                        series.getData().add(chartData);
+                    });
+                    return series;
+                }).forEach((series) -> {
+                    barChart.getData().add(series);
+                });
+                break;
+        }
     }
 
     /**
-     * Builds Line Chart based on filtered data.
-     * Iterates over all vehicle values to ensure chart data and series
-     * are consistent.
+     * Builds Line Chart based on filtered data. Iterates over all
+     * vehicle/region values to ensure chart data and series are consistent.
      * Also adds custom hover label for data nodes.
      */
     private void buildLineChart() {
         lineChart.getData().clear();
-        lineChart.getXAxis().setLabel("Vehicle");
 
-        vehicles.stream().map((vehicle) -> {
-            XYChart.Series series = new XYChart.Series();
-            series.setName(vehicle);
-            Map<Integer, Integer> totalSalesByYear = filteredData.stream()
-                    .filter(o -> o.getVehicle().equals(vehicle))
-                    .collect(Collectors.groupingBy(Sales::getYear, Collectors.reducing(0, Sales::getQuantity, Integer::sum)));
-            
-            totalSalesByYear.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey)).map((entry) -> {
-                XYChart.Data chartData = new XYChart.Data<>(entry.getKey().toString(), entry.getValue());
-                chartData.setNode(new ChartDataHoverLabel(entry.getValue()));
-                return chartData;
-            }).forEach((chartData) -> {
-                series.getData().add(chartData);
-            });
-            return series;
-        }).forEach((series) -> {
-            lineChart.getData().add(series);
-        });
+        String seriesName = lineSeriesChoiceBox.getSelectionModel().getSelectedItem().toString();
+        lineChart.setTitle(String.format("Total Sales per year - by %s", seriesName));
+        lineChart.getXAxis().setLabel("Years");
+        lineChart.getYAxis().setLabel("Units Sold");
+        switch (seriesName) {
+            case "Vehicles":
+                vehicles.stream().map((vehicle) -> {
+                    XYChart.Series series = new XYChart.Series();
+                    series.setName(vehicle);
+                    Map<Integer, Integer> totalSalesByYear = filteredData.stream()
+                            .filter(o -> o.getVehicle().equals(vehicle))
+                            .collect(Collectors.groupingBy(Sales::getYear, Collectors.reducing(0, Sales::getQuantity, Integer::sum)));
+
+                    totalSalesByYear.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey)).map((entry) -> {
+                        XYChart.Data chartData = new XYChart.Data<>(entry.getKey().toString(), entry.getValue());
+                        chartData.setNode(new ChartDataHoverLabel(entry.getValue()));
+                        return chartData;
+                    }).forEach((chartData) -> {
+                        series.getData().add(chartData);
+                    });
+                    return series;
+                }).forEach((series) -> {
+                    lineChart.getData().add(series);
+                });
+                break;
+            case "Regions":
+                regions.stream().map((region) -> {
+                    XYChart.Series series = new XYChart.Series();
+                    series.setName(region);
+                    Map<Integer, Integer> totalSalesByYear = filteredData.stream()
+                            .filter(o -> o.getRegion().equals(region))
+                            .collect(Collectors.groupingBy(Sales::getYear, Collectors.reducing(0, Sales::getQuantity, Integer::sum)));
+
+                    totalSalesByYear.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey)).map((entry) -> {
+                        XYChart.Data chartData = new XYChart.Data<>(entry.getKey().toString(), entry.getValue());
+                        chartData.setNode(new ChartDataHoverLabel(entry.getValue()));
+                        return chartData;
+                    }).forEach((chartData) -> {
+                        series.getData().add(chartData);
+                    });
+                    return series;
+                }).forEach((series) -> {
+                    lineChart.getData().add(series);
+                });
+                break;
+        }
     }
 
     /**
@@ -533,8 +617,8 @@ public class DashboardController implements Initializable {
     }
 
     /**
-     * Used to compare previous to new as CheckBoxs 
-     * rebuilt on receiving new data.
+     * Used to compare previous to new as CheckBoxs rebuilt on receiving new
+     * data.
      */
     private void createFilterCheckboxes() {
         List<CheckBox> temp;
@@ -555,8 +639,8 @@ public class DashboardController implements Initializable {
     }
 
     /**
-     * Dynamically builds global filter controls
-     * and adds to static VBox defined by FXML
+     * Dynamically builds global filter controls and adds to static VBox defined
+     * by FXML
      */
     private void addFiltersToUI() {
         chartFilters.getChildren().clear();
@@ -571,8 +655,8 @@ public class DashboardController implements Initializable {
     }
 
     /**
-     * Accepts list of CheckBox to build a HBox of filters for this
-     * filter type.
+     * Accepts list of CheckBox to build a HBox of filters for this filter type.
+     *
      * @param checkBoxes
      * @return HBox
      */
@@ -588,9 +672,10 @@ public class DashboardController implements Initializable {
 
     /**
      * Compares new CheckBox list to existing to preserve selected states.
+     *
      * @param cbList
      * @param list
-     * @return 
+     * @return
      */
     private List<CheckBox> buildCheckboxes(List<CheckBox> cbList, List list) {
         List<CheckBox> checkBoxes = new ArrayList<>();
@@ -640,9 +725,8 @@ public class DashboardController implements Initializable {
     }
 
     /**
-     * Main method to push data to the UI.
-     * Data is filtered based on selected CheckBoxs.
-     * Nested loop with checks to reduce processing.
+     * Main method to push data to the UI. Data is filtered based on selected
+     * CheckBoxs. Nested loop with checks to reduce processing.
      */
     public void filterData() {
         filteredData.clear();
@@ -837,7 +921,7 @@ public class DashboardController implements Initializable {
         } else {
             errored = true;
         }
-        
+
         if (!addVehicleComboBox.getEditor().getText().equals("")) {
             try {
                 newSalesData.setVehicle(addVehicleComboBox.getEditor().getText());
@@ -845,7 +929,7 @@ public class DashboardController implements Initializable {
                 errored = true;
                 outputMessage += "* Year in wrong format\n";
             }
-        }else if (addVehicleComboBox.getValue() != null
+        } else if (addVehicleComboBox.getValue() != null
                 && !addVehicleComboBox.getValue().toString().isEmpty()) {
             try {
                 newSalesData.setVehicle(addVehicleComboBox.getValue().toString());
@@ -856,7 +940,7 @@ public class DashboardController implements Initializable {
         } else {
             errored = true;
         }
-        
+
         if (addRegionComboBox.getValue() != null) {
             try {
                 newSalesData.setRegion(addRegionComboBox.getValue().toString());
@@ -867,7 +951,7 @@ public class DashboardController implements Initializable {
         } else {
             errored = true;
         }
-        
+
         if (!addQuantityTextField.getText().equals("")) {
             try {
                 newSalesData.setQuantity(Integer.parseInt(addQuantityTextField.getText()));
